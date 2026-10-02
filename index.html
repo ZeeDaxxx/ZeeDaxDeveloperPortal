@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZeeDax</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#0B0D12',
+              card: '#131722',
+              border: '#1F2430',
+              accent: '#38BDF8',
+              text: '#94A3B8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-brand-bg text-gray-100 font-sans antialiased min-h-screen selection:bg-brand-accent/20 selection:text-brand-accent">
+
+  <div class="max-w-4xl mx-auto px-6 py-16">
+
+    <!-- Hero Header -->
+    <header class="mb-16 border-b border-brand-border pb-12">
+      <div class="flex items-center justify-between mb-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Almost closed!
+        </div>
+        <div class="text-xs font-mono text-brand-text flex gap-4">
+          <span>Discord: <strong class="text-white">darshanwin</strong></span>
+          <span>Roblox: <strong class="text-white">@darshanwin</strong></span>
+          <span>Minecraft: <strong class="text-white">ZeeDax</strong></span>
+
+        </div>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+        Minecraft/Roblox developer and builder.
+      </h1>
+      <p class="text-lg text-brand-text max-w-2xl leading-relaxed">
+        Working on many projects and helping many clients at the moment!
+      </p>
+    </header>
+
+    <!-- Tech Stack -->
+    <section class="mb-16">
+      <h2 class="text-sm font-mono uppercase tracking-widest text-brand-accent mb-6">Capabilities</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="p-4 rounded-xl bg-brand-card border border-brand-border">
+          <div class="font-bold text-white text-base mb-1">Luau</div>
+          <p class="text-xs text-brand-text">OOP, Frameworks, DataStores</p>
+        </div>
+        <div class="p-4 rounded-xl bg-brand-card border border-brand-border">
+          <div class="font-bold text-white text-base mb-1">Python</div>
+          <p class="text-xs text-brand-text">Tooling & Script Automation</p>
+        </div>
+        <div class="p-4 rounded-xl bg-brand-card border border-brand-border">
+          <div class="font-bold text-white text-base mb-1">JSON</div>
+          <p class="text-xs text-brand-text">Data & Config Structuring</p>
+        </div>
+        <div class="p-4 rounded-xl bg-brand-card border border-brand-border">
+          <div class="font-bold text-white text-base mb-1">YAML</div>
+          <p class="text-xs text-brand-text">Build Specs & Settings</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Roblox Contributions (Loaded via JSON) -->
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-sm font-mono uppercase tracking-widest text-brand-accent">Roblox Contributions</h2>
+        <span class="text-xs font-mono text-brand-text">Source: ZeeDax's brain</span>
+      </div>
+
+      <div id="projects-container" class="space-y-6">
+        <div class="text-center py-8 text-brand-text font-mono text-sm">
+          Loading projects...
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-20 pt-8 border-t border-brand-border text-center text-xs font-mono text-brand-text">
+      © 2026 ZeeDax I All rights reserved!
+    </footer>
+
+  </div>
+
+  <script>
+    async function loadProjects() {
+      const container = document.getElementById('projects-container');
+      try {
+        const response = await fetch('projects.json');
+        if (!response.ok) throw new Error('Failed to load JSON');
+        const projects = await response.json();
+
+        container.innerHTML = projects.map(project => `
+          <div class="p-6 rounded-xl bg-brand-card border border-brand-border transition hover:border-brand-accent/50">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+              <h3 class="text-xl font-bold text-white">${project.title}</h3>
+              <span class="text-xs font-mono px-2.5 py-1 rounded bg-brand-bg text-brand-accent border border-brand-border w-fit">
+                ${project.role}
+              </span>
+            </div>
+
+            <p class="text-sm text-brand-text mb-4 leading-relaxed">
+              ${project.description}
+            </p>
+
+            <div class="grid grid-cols-3 gap-2 py-3 px-4 rounded-lg bg-brand-bg/50 border border-brand-border/50 mb-4 text-center">
+              <div>
+                <div class="text-xs text-brand-text font-mono">Visits</div>
+                <div class="text-sm font-bold text-white">${project.stats.visits}</div>
+              </div>
+              <div>
+                <div class="text-xs text-brand-text font-mono">Peak CCU</div>
+                <div class="text-sm font-bold text-white">${project.stats.ccu}</div>
+              </div>
+              <div>
+                <div class="text-xs text-brand-text font-mono">Rating</div>
+                <div class="text-sm font-bold text-white">${project.stats.rating}</div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              ${project.tags.map(tag => `
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-brand-bg text-brand-text border border-brand-border">
+                  ${tag}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        container.innerHTML = `
+          <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-mono text-center">
+            Error loading projects.json. Make sure main.py is running.
+          </div>
+        `;
+      }
+    }
+
+    loadProjects();
+  </script>
+</body>
+</html>
