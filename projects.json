@@ -8,6 +8,17 @@
       "visits": "Unpublished",
       "ccu": "Unpublished",
       "rating": "Unpublished"
+      }
+  },
+  {
+    "title": "DataStore & Inventory System",
+    "role": "Backend Developer",
+    "description": "Engineered a reliable cross-server data persistence architecture with compression, session locking, and backup protection.",
+    "tags": ["Luau", "DataStores", "ProfileService", "JSON"],
+    "stats": {
+      "visits": "659+",
+      "ccu": "143+",
+      "rating": "100%"
     }
   }
 ]
