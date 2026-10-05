@@ -11,9 +11,9 @@
       }
   },
   {
-    "title": "DataStore & Inventory System",
-    "role": "Backend Developer",
-    "description": "Engineered a reliable cross-server data persistence architecture with compression, session locking, and backup protection.",
+    "title": "Build a popular website",
+    "role": "Co-Owner",
+    "description": "Help prompting the developer and design ideas.",
     "tags": ["Luau", "DataStores", "ProfileService", "JSON"],
     "stats": {
       "visits": "659+",
