@@ -1,1 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeeDax Assistance</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-main: #212121;
+            --bg-sidebar: #171717;
+            --bg-hover: #2f2f2f;
+            --bg-modal: #2a2a2a;
+            --text-primary: #ececec;
+            --text-secondary: #b4b4b4;
+            --border-color: #383838;
+            --danger-color: #ef4444;
+            --accent-color: #3b82f6;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            height: 100%;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+        }
+
+        .brand-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 8px;
+        }
+
+        .brand-dropdown:hover {
+            background-color: var(--bg-hover);
+        }
+
+        .header-icon {
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+        }
+
+        .header-icon:hover {
+            background-color: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* New Chat Button */
+        .new-chat-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            transition: background 0.2s;
+        }
+
+        .new-chat-btn:hover {
+            background-color: var(--bg-hover);
+        }
+
+        /* Chats List */
+        .chats-category {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+
+        .category-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .chat-item:hover {
+            background-color: var(--bg-hover);
+        }
+
+        .chat-item.active {
+            background-color: var(--bg-hover);
+            font-weight: 600;
+        }
+
+        /* Footer & Settings */
+        .sidebar-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .settings-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .settings-btn:hover {
+            background-color: var(--bg-hover);
+        }
+
+        /* Main Workspace */
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            background-color: var(--bg-main);
+        }
+
+        .chat-messages {
+            width: 100%;
+            max-width: 768px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-top: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 85%;
+            line-height: 1.5;
+            font-size: 15px;
+            white-space: pre-wrap;
+        }
+
+        .message.assistant {
+            background-color: var(--bg-sidebar);
+            align-self: flex-start;
+            border: 1px solid var(--border-color);
+        }
+
+        .message.user {
+            background-color: #2f3e46;
+            align-self: flex-end;
+        }
+
+        .input-container {
+            width: 100%;
+            max-width: 768px;
+            background-color: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-container input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+
+        .send-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .send-btn:hover {
+            color: var(--text-primary);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--bg-modal);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 400px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Layout -->
+    <aside class="sidebar">
+        <!-- Brand Header -->
+        <div class="sidebar-header">
+            <div class="brand-dropdown">
+                ZeeDax Assistance
+                <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
+            </div>
+            <i data-lucide="panel-left-close" class="header-icon" style="width: 20px; height: 20px;"></i>
+        </div>
+
+        <!-- New Chat Button -->
+        <div class="new-chat-btn" onclick="openCreateChatModal()">
+            <i data-lucide="square-pen" style="width: 18px; height: 18px;"></i>
+            <span>New chat</span>
+        </div>
+
+        <!-- Category Area -->
+        <div class="chats-category">
+            <div class="category-title">Your Chats</div>
+            <div id="chat-list"></div>
+        </div>
+
+        <!-- Footer / Settings Button -->
+        <div class="sidebar-footer">
+            <div class="settings-btn" onclick="openSettingsModal()">
+                <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
+                <span>Settings</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-chat">
+        <div class="chat-messages" id="messages-container"></div>
+
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Message ZeeDax Assistance..." onkeydown="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">
+                <i data-lucide="arrow-up-right" style="width: 20px; height: 20px;"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- Create Chat Modal -->
+    <div class="modal-overlay" id="create-modal">
+        <div class="modal">
+            <div class="modal-header">Create New Chat</div>
+            <input type="text" id="new-chat-title" placeholder="Enter chat title (e.g., Python Help)">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeCreateChatModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitCreateChat()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <div class="modal-header">Settings</div>
+            <p style="font-size: 14px; color: var(--text-secondary);">Manage your session profile preferences and chat history.</p>
+            <button class="btn btn-danger" onclick="resetAllChats()">Reset All Chats</button>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSettingsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentChats = [];
+        let activeChatId = null;
+
+        async function loadUserProfile() {
+            const response = await fetch('/api/profile');
+            const data = await response.json();
+
+            currentChats = data.chats;
+            if (!activeChatId && currentChats.length > 0) {
+                activeChatId = currentChats[0].id;
+            }
+            renderSidebar();
+            renderActiveMessages();
+        }
+
+        function renderSidebar() {
+            const chatList = document.getElementById('chat-list');
+            chatList.innerHTML = '';
+
+            currentChats.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = `chat-item ${chat.id === activeChatId ? 'active' : ''}`;
+                item.onclick = () => selectChat(chat.id);
+                item.innerHTML = `<i data-lucide="message-square" style="width: 16px; height: 16px;"></i> ${chat.title}`;
+                chatList.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        function selectChat(chatId) {
+            activeChatId = chatId;
+            renderSidebar();
+            renderActiveMessages();
+        }
+
+        function renderActiveMessages() {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+
+            const activeChat = currentChats.find(c => c.id === activeChatId);
+            if (activeChat) {
+                activeChat.messages.forEach(msg => {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `message ${msg.role}`;
+                    msgDiv.innerText = msg.content;
+                    container.appendChild(msgDiv);
+                });
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text || !activeChatId) return;
+
+            const activeChat = currentChats.find(c => c.id === activeChatId);
+            activeChat.messages.push({ role: "user", content: text });
+            input.value = '';
+            renderActiveMessages();
+
+            const response = await fetch('/api/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: activeChatId, message: text })
+            });
+
+            const resData = await response.json();
+            activeChat.messages.push({ role: "assistant", content: resData.content });
+            renderActiveMessages();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function openCreateChatModal() { document.getElementById('create-modal').style.display = 'flex'; }
+        function closeCreateChatModal() { document.getElementById('create-modal').style.display = 'none'; }
+
+        async function submitCreateChat() {
+            const titleInput = document.getElementById('new-chat-title');
+            const title = titleInput.value.trim();
+
+            const response = await fetch('/api/chats/new', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: title })
+            });
+
+            if (response.ok) {
+                const newChat = await response.json();
+                activeChatId = newChat.id;
+                titleInput.value = '';
+                closeCreateChatModal();
+                await loadUserProfile();
+            }
+        }
+
+        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
+
+        async function resetAllChats() {
+            if (confirm("Are you sure you want to delete all chats?")) {
+                await fetch('/api/chats/reset', { method: 'POST' });
+                activeChatId = null;
+                closeSettingsModal();
+                await loadUserProfile();
+            }
+        }
+
+        window.onload = loadUserProfile;
+    </script>
+</body>
+</html>
