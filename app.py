@@ -3,9 +3,11 @@ import json
 import uuid
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
 from groq import Groq
 
 app = Flask(__name__)
+CORS(app)  # Enables cross-origin requests from GitHub Pages
 
 # ==============================================================================
 # CONFIGURATION SETTINGS
@@ -32,7 +34,7 @@ groq_client = None
 init_error_message = None
 
 if not GROQ_API_KEY or GROQ_API_KEY == "gsk_your_actual_groq_key_here":
-    init_error_message = "[Configuration Error]: Please paste your real Groq API key on line 14 of app.py!"
+    init_error_message = "[Configuration Error]: Please paste your real Groq API key on line 15 of app.py!"
 else:
     try:
         groq_client = Groq(api_key=GROQ_API_KEY)
@@ -51,17 +53,14 @@ def load_data():
     except (json.JSONDecodeError, OSError):
         return {}
 
-
 def save_data(data):
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
-
 
 def get_client_ip():
     if request.headers.get('X-Forwarded-For'):
         return request.headers.get('X-Forwarded-For').split(',')[0].strip()
     return request.remote_addr
-
 
 def get_or_create_profile(user_ip, profiles):
     if user_ip not in profiles:
@@ -92,7 +91,6 @@ def index():
     get_or_create_profile(user_ip, profiles)
     return render_template('index.html')
 
-
 @app.route('/api/profile', methods=['GET'])
 def get_profile_data():
     user_ip = get_client_ip()
@@ -104,17 +102,16 @@ def get_profile_data():
         "active_chat_id": profile["active_chat_id"]
     })
 
-
 @app.route('/api/chats/new', methods=['POST'])
 def create_new_chat():
     user_ip = get_client_ip()
     profiles = load_data()
     profile = get_or_create_profile(user_ip, profiles)
-
+    
     data = request.json or {}
     chat_title = data.get("title", "").strip() or f"New Chat {len(profile['chats']) + 1}"
     new_chat_id = f"chat_{uuid.uuid4().hex[:6]}"
-
+    
     new_chat = {
         "id": new_chat_id,
         "title": chat_title,
@@ -122,37 +119,35 @@ def create_new_chat():
             {"role": "assistant", "content": f"Welcome to '{chat_title}'! How can I help?"}
         ]
     }
-
+    
     profile["chats"].insert(0, new_chat)
     profile["active_chat_id"] = new_chat_id
     save_data(profiles)
-
+    
     return jsonify(new_chat)
-
 
 @app.route('/api/chats/reset', methods=['POST'])
 def reset_chats():
     user_ip = get_client_ip()
     profiles = load_data()
-
+    
     if user_ip in profiles:
         del profiles[user_ip]
         save_data(profiles)
-
+        
     get_or_create_profile(user_ip, profiles)
     return jsonify({"status": "success", "message": "All chats reset successfully."})
-
 
 @app.route('/api/message', methods=['POST'])
 def send_message():
     user_ip = get_client_ip()
     profiles = load_data()
     profile = get_or_create_profile(user_ip, profiles)
-
+    
     data = request.json or {}
     chat_id = data.get("chat_id")
     user_text = data.get("message", "").strip()
-
+    
     if not user_text:
         return jsonify({"error": "Empty message"}), 400
 
@@ -162,11 +157,9 @@ def send_message():
 
     target_chat["messages"].append({"role": "user", "content": user_text})
 
-    # Output error straight into chatbox if key is missing or invalid
     if init_error_message or not groq_client:
         ai_reply = init_error_message or "[Configuration Error]: Groq client failed to initialize."
     else:
-        # Build payload using personality.txt content
         groq_messages = [
             {"role": "system", "content": SYSTEM_PERSONA}
         ]
@@ -187,7 +180,6 @@ def send_message():
     save_data(profiles)
 
     return jsonify({"role": "assistant", "content": ai_reply})
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=PORT)
