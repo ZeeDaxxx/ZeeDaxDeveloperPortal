@@ -1,152 +1,491 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZeeDax</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              bg: '#0B0D12',
-              card: '#131722',
-              border: '#1F2430',
-              accent: '#38BDF8',
-              text: '#94A3B8'
-            }
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeeDax Assistance</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-main: #212121;
+            --bg-sidebar: #171717;
+            --bg-hover: #2f2f2f;
+            --bg-modal: #2a2a2a;
+            --text-primary: #ececec;
+            --text-secondary: #b4b4b4;
+            --border-color: #383838;
+            --danger-color: #ef4444;
+            --accent-color: #3b82f6;
         }
-      }
-    }
-  </script>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            height: 100%;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+        }
+
+        .brand-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 8px;
+        }
+
+        .brand-dropdown:hover {
+            background-color: var(--bg-hover);
+        }
+
+        .header-icon {
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+        }
+
+        .header-icon:hover {
+            background-color: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* New Chat Button */
+        .new-chat-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            transition: background 0.2s;
+        }
+
+        .new-chat-btn:hover {
+            background-color: var(--bg-hover);
+        }
+
+        /* Chats List */
+        .chats-category {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+
+        .category-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .chat-item:hover {
+            background-color: var(--bg-hover);
+        }
+
+        .chat-item.active {
+            background-color: var(--bg-hover);
+            font-weight: 600;
+        }
+
+        /* Footer & Settings */
+        .sidebar-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .settings-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .settings-btn:hover {
+            background-color: var(--bg-hover);
+        }
+
+        /* Main Workspace */
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            background-color: var(--bg-main);
+        }
+
+        .chat-messages {
+            width: 100%;
+            max-width: 768px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-top: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 85%;
+            line-height: 1.5;
+            font-size: 15px;
+            white-space: pre-wrap;
+        }
+
+        .message.assistant {
+            background-color: var(--bg-sidebar);
+            align-self: flex-start;
+            border: 1px solid var(--border-color);
+        }
+
+        .message.user {
+            background-color: #2f3e46;
+            align-self: flex-end;
+        }
+
+        .input-container {
+            width: 100%;
+            max-width: 768px;
+            background-color: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-container input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+
+        .send-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .send-btn:hover {
+            color: var(--text-primary);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--bg-modal);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 400px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+    </style>
 </head>
-<body class="bg-brand-bg text-gray-100 font-sans antialiased min-h-screen selection:bg-brand-accent/20 selection:text-brand-accent">
+<body>
 
-  <div class="max-w-4xl mx-auto px-6 py-16">
-
-    <!-- Hero Header -->
-<header class="mb-16 border-b border-brand-border pb-12">
-  <div class="flex items-center justify-between mb-6">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono">
-      <span class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
-      Closed.
-        </div>
-        <div class="text-xs font-mono text-brand-text flex gap-4">
-          <span>Discord: <strong class="text-white">darshanwin</strong></span>
-          <span>Roblox: <strong class="text-white">@darshanwin</strong></span>
-          <span>Minecraft: <strong class="text-white">ZeeDax</strong></span>
-
-        </div>
-      </div>
-      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-        Minecraft/Roblox developer and builder.
-      </h1>
-      <p class="text-lg text-brand-text max-w-2xl leading-relaxed">
-        Working on many projects and helping many clients at the moment!
-      </p>
-    </header>
-
-    <!-- Tech Stack -->
-    <section class="mb-16">
-      <h2 class="text-sm font-mono uppercase tracking-widest text-brand-accent mb-6">Capabilities</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="p-4 rounded-xl bg-brand-card border border-brand-border">
-          <div class="font-bold text-white text-base mb-1">Luau</div>
-          <p class="text-xs text-brand-text">OOP, Frameworks, DataStores</p>
-        </div>
-        <div class="p-4 rounded-xl bg-brand-card border border-brand-border">
-          <div class="font-bold text-white text-base mb-1">Python</div>
-          <p class="text-xs text-brand-text">Tooling & Script Automation</p>
-        </div>
-        <div class="p-4 rounded-xl bg-brand-card border border-brand-border">
-          <div class="font-bold text-white text-base mb-1">JSON</div>
-          <p class="text-xs text-brand-text">Data & Config Structuring</p>
-        </div>
-        <div class="p-4 rounded-xl bg-brand-card border border-brand-border">
-          <div class="font-bold text-white text-base mb-1">YAML</div>
-          <p class="text-xs text-brand-text">Build Specs & Settings</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Roblox Contributions (Loaded via JSON) -->
-    <section>
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-sm font-mono uppercase tracking-widest text-brand-accent">Roblox Contributions</h2>
-        <span class="text-xs font-mono text-brand-text">Source: ZeeDax's brain</span>
-      </div>
-
-      <div id="projects-container" class="space-y-6">
-        <div class="text-center py-8 text-brand-text font-mono text-sm">
-          Loading projects...
-        </div>
-      </div>
-    </section>
-
-    <footer class="mt-20 pt-8 border-t border-brand-border text-center text-xs font-mono text-brand-text">
-      © 2026 ZeeDax / All rights reserved!
-    </footer>
-
-  </div>
-
-  <script>
-    async function loadProjects() {
-      const container = document.getElementById('projects-container');
-      try {
-        const response = await fetch('projects.json');
-        if (!response.ok) throw new Error('Failed to load JSON');
-        const projects = await response.json();
-
-        container.innerHTML = projects.map(project => `
-          <div class="p-6 rounded-xl bg-brand-card border border-brand-border transition hover:border-brand-accent/50">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
-              <h3 class="text-xl font-bold text-white">${project.title}</h3>
-              <span class="text-xs font-mono px-2.5 py-1 rounded bg-brand-bg text-brand-accent border border-brand-border w-fit">
-                ${project.role}
-              </span>
+    <!-- Sidebar Layout -->
+    <aside class="sidebar">
+        <!-- Brand Header -->
+        <div class="sidebar-header">
+            <div class="brand-dropdown">
+                ZeeDax Assistance
+                <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
             </div>
+            <i data-lucide="panel-left-close" class="header-icon" style="width: 20px; height: 20px;"></i>
+        </div>
 
-            <p class="text-sm text-brand-text mb-4 leading-relaxed">
-              ${project.description}
-            </p>
+        <!-- New Chat Button -->
+        <div class="new-chat-btn" onclick="openCreateChatModal()">
+            <i data-lucide="square-pen" style="width: 18px; height: 18px;"></i>
+            <span>New chat</span>
+        </div>
 
-            <div class="grid grid-cols-3 gap-2 py-3 px-4 rounded-lg bg-brand-bg/50 border border-brand-border/50 mb-4 text-center">
-              <div>
-                <div class="text-xs text-brand-text font-mono">Visits</div>
-                <div class="text-sm font-bold text-white">${project.stats.visits}</div>
-              </div>
-              <div>
-                <div class="text-xs text-brand-text font-mono">Peak CCU</div>
-                <div class="text-sm font-bold text-white">${project.stats.ccu}</div>
-              </div>
-              <div>
-                <div class="text-xs text-brand-text font-mono">Rating</div>
-                <div class="text-sm font-bold text-white">${project.stats.rating}</div>
-              </div>
+        <!-- Category Area -->
+        <div class="chats-category">
+            <div class="category-title">Your Chats</div>
+            <div id="chat-list"></div>
+        </div>
+
+        <!-- Footer / Settings Button -->
+        <div class="sidebar-footer">
+            <div class="settings-btn" onclick="openSettingsModal()">
+                <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
+                <span>Settings</span>
             </div>
+        </div>
+    </aside>
 
-            <div class="flex flex-wrap gap-2">
-              ${project.tags.map(tag => `
-                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-brand-bg text-brand-text border border-brand-border">
-                  ${tag}
-                </span>
-              `).join('')}
+    <!-- Main Workspace -->
+    <main class="main-chat">
+        <div class="chat-messages" id="messages-container"></div>
+
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Message ZeeDax Assistance..." onkeydown="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">
+                <i data-lucide="arrow-up-right" style="width: 20px; height: 20px;"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- Create Chat Modal -->
+    <div class="modal-overlay" id="create-modal">
+        <div class="modal">
+            <div class="modal-header">Create New Chat</div>
+            <input type="text" id="new-chat-title" placeholder="Enter chat title (e.g., Python Help)">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeCreateChatModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitCreateChat()">Create</button>
             </div>
-          </div>
-        `).join('');
-      } catch (error) {
-        container.innerHTML = `
-          <div class="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-mono text-center">
-            Error loading projects.json. Make sure main.py is running.
-          </div>
-        `;
-      }
-    }
+        </div>
+    </div>
 
-    loadProjects();
-  </script>
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <div class="modal-header">Settings</div>
+            <p style="font-size: 14px; color: var(--text-secondary);">Manage your session profile preferences and chat history.</p>
+            <button class="btn btn-danger" onclick="resetAllChats()">Reset All Chats</button>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSettingsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentChats = [];
+        let activeChatId = null;
+
+        async function loadUserProfile() {
+            const response = await fetch('/api/profile');
+            const data = await response.json();
+
+            currentChats = data.chats;
+            if (!activeChatId && currentChats.length > 0) {
+                activeChatId = currentChats[0].id;
+            }
+            renderSidebar();
+            renderActiveMessages();
+        }
+
+        function renderSidebar() {
+            const chatList = document.getElementById('chat-list');
+            chatList.innerHTML = '';
+
+            currentChats.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = `chat-item ${chat.id === activeChatId ? 'active' : ''}`;
+                item.onclick = () => selectChat(chat.id);
+                item.innerHTML = `<i data-lucide="message-square" style="width: 16px; height: 16px;"></i> ${chat.title}`;
+                chatList.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        function selectChat(chatId) {
+            activeChatId = chatId;
+            renderSidebar();
+            renderActiveMessages();
+        }
+
+        function renderActiveMessages() {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+
+            const activeChat = currentChats.find(c => c.id === activeChatId);
+            if (activeChat) {
+                activeChat.messages.forEach(msg => {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `message ${msg.role}`;
+                    msgDiv.innerText = msg.content;
+                    container.appendChild(msgDiv);
+                });
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text || !activeChatId) return;
+
+            const activeChat = currentChats.find(c => c.id === activeChatId);
+            activeChat.messages.push({ role: "user", content: text });
+            input.value = '';
+            renderActiveMessages();
+
+            const response = await fetch('/api/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: activeChatId, message: text })
+            });
+
+            const resData = await response.json();
+            activeChat.messages.push({ role: "assistant", content: resData.content });
+            renderActiveMessages();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function openCreateChatModal() { document.getElementById('create-modal').style.display = 'flex'; }
+        function closeCreateChatModal() { document.getElementById('create-modal').style.display = 'none'; }
+
+        async function submitCreateChat() {
+            const titleInput = document.getElementById('new-chat-title');
+            const title = titleInput.value.trim();
+
+            const response = await fetch('/api/chats/new', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: title })
+            });
+
+            if (response.ok) {
+                const newChat = await response.json();
+                activeChatId = newChat.id;
+                titleInput.value = '';
+                closeCreateChatModal();
+                await loadUserProfile();
+            }
+        }
+
+        function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
+
+        async function resetAllChats() {
+            if (confirm("Are you sure you want to delete all chats?")) {
+                await fetch('/api/chats/reset', { method: 'POST' });
+                activeChatId = null;
+                closeSettingsModal();
+                await loadUserProfile();
+            }
+        }
+
+        window.onload = loadUserProfile;
+    </script>
 </body>
 </html>
