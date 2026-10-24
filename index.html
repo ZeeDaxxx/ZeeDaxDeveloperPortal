@@ -79,7 +79,6 @@
             color: var(--text-primary);
         }
 
-        /* New Chat Button */
         .new-chat-btn {
             display: flex;
             align-items: center;
@@ -97,7 +96,6 @@
             background-color: var(--bg-hover);
         }
 
-        /* Chats List */
         .chats-category {
             flex: 1;
             overflow-y: auto;
@@ -137,7 +135,6 @@
             font-weight: 600;
         }
 
-        /* Footer & Settings */
         .sidebar-footer {
             border-top: 1px solid var(--border-color);
             padding-top: 12px;
@@ -161,7 +158,6 @@
             background-color: var(--bg-hover);
         }
 
-        /* Main Workspace */
         .main-chat {
             flex: 1;
             display: flex;
@@ -237,7 +233,6 @@
             color: var(--text-primary);
         }
 
-        /* Modals */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -306,9 +301,7 @@
 </head>
 <body>
 
-    <!-- Sidebar Layout -->
     <aside class="sidebar">
-        <!-- Brand Header -->
         <div class="sidebar-header">
             <div class="brand-dropdown">
                 ZeeDax Assistance
@@ -317,19 +310,16 @@
             <i data-lucide="panel-left-close" class="header-icon" style="width: 20px; height: 20px;"></i>
         </div>
 
-        <!-- New Chat Button -->
         <div class="new-chat-btn" onclick="openCreateChatModal()">
             <i data-lucide="square-pen" style="width: 18px; height: 18px;"></i>
             <span>New chat</span>
         </div>
 
-        <!-- Category Area -->
         <div class="chats-category">
             <div class="category-title">Your Chats</div>
             <div id="chat-list"></div>
         </div>
 
-        <!-- Footer / Settings Button -->
         <div class="sidebar-footer">
             <div class="settings-btn" onclick="openSettingsModal()">
                 <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
@@ -338,7 +328,6 @@
         </div>
     </aside>
 
-    <!-- Main Workspace -->
     <main class="main-chat">
         <div class="chat-messages" id="messages-container"></div>
 
@@ -350,7 +339,6 @@
         </div>
     </main>
 
-    <!-- Create Chat Modal -->
     <div class="modal-overlay" id="create-modal">
         <div class="modal">
             <div class="modal-header">Create New Chat</div>
@@ -362,7 +350,6 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
     <div class="modal-overlay" id="settings-modal">
         <div class="modal">
             <div class="modal-header">Settings</div>
@@ -375,11 +362,14 @@
     </div>
 
     <script>
+        // Replace API_BASE with your deployed backend URL (e.g., "https://zeedax-backend.onrender.com")
+        const API_BASE = "";
+
         let currentChats = [];
         let activeChatId = null;
 
         async function loadUserProfile() {
-            const response = await fetch('/api/profile');
+            const response = await fetch(`${API_BASE}/api/profile`);
             const data = await response.json();
 
             currentChats = data.chats;
@@ -436,7 +426,7 @@
             input.value = '';
             renderActiveMessages();
 
-            const response = await fetch('/api/message', {
+            const response = await fetch(`${API_BASE}/api/message`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: activeChatId, message: text })
@@ -458,7 +448,7 @@
             const titleInput = document.getElementById('new-chat-title');
             const title = titleInput.value.trim();
 
-            const response = await fetch('/api/chats/new', {
+            const response = await fetch(`${API_BASE}/api/chats/new`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: title })
@@ -478,7 +468,7 @@
 
         async function resetAllChats() {
             if (confirm("Are you sure you want to delete all chats?")) {
-                await fetch('/api/chats/reset', { method: 'POST' });
+                await fetch(`${API_BASE}/api/chats/reset`, { method: 'POST' });
                 activeChatId = null;
                 closeSettingsModal();
                 await loadUserProfile();
